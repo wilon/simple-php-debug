@@ -78,7 +78,7 @@ function simpledebug_array_keys_vals($array, $key = '', $splice = '|=|')
         $resKey = $key ? "$key$splice$k" : $k;
         $res[$resKey] = $v;
         if (is_array($v)) {
-            $res = array_merge($res, array_all_keys_vals($v, $resKey, $splice));
+            $res = array_merge($res, simpledebug_array_keys_vals($v, $resKey, $splice));
         }
     }
     foreach ($res as $k => $v) {
