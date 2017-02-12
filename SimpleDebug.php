@@ -1,15 +1,33 @@
 <?php
 
-function simple_dump(&$arg0 = null, &$arg1 = null, &$arg2 = null, &$arg3 = null, &$arg4 = null, &$arg5 = null, &$arg6 = null, &$arg7 = null, &$arg8 = null, &$arg9 = null, &$arg10 = null, &$arg11 = null, &$arg12 = null, &$arg13 = null, &$arg14 = null, &$arg15 = null, &$arg16 = null, &$arg17 = null, &$arg18 = null, &$arg19 = null, &$arg20 = null)
-{
-    $allArgs = array(&$arg0, &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11, &$arg12, &$arg13, &$arg14, &$arg15, &$arg16, &$arg17, &$arg18, &$arg19, &$arg20);
-    $argsNum = func_num_args();
-    ob_start();
-    foreach ($allArgs as $k => &$arg) {
-        if ($k === $argsNum) {
+function simple_dump() {
+    // debug_print_backtrace();
+    $bt = debug_backtrace();
+    $btUse = $bt[0];
+    $file = new \SPLFileObject($btUse['file']);
+    $lineEnd = $btUse['line'];
+    $codeStr = '';
+    foreach ($file as $lineNum => $line) {
+        if ($lineNum == $lineEnd) {
             break;
         }
-        $key = get_variable_name($arg);
+        if (strpos($line, $btUse['function']) !== false) {
+            $codeStr .= $line;
+            continue;
+        }
+        if ($codeStr !== '') {
+            $codeStr .= $line;
+        }
+    }
+    $matchs = null;
+    $argsCommaNum = count($btUse['args']) - 1;
+    $preg = "/{$btUse['function']}\(((.*?,){{$argsCommaNum}}.*?)\)/is";
+    preg_match($preg, $codeStr, $matchs);
+    ob_start();$s=array($codeStr, $matchs);foreach($s as $v){var_dump($v);}die('<pre style="white-space:pre-wrap;word-wrap:break-word;">'.preg_replace(array('/\]\=\>\n(\s+)/m','/</m','/>/m'),array('] => ','&lt;','&gt;'),ob_get_clean()).'');
+    $paramNames = array_map('trim', explode(',', $matchs[1]));
+    ob_start();
+    foreach ($btUse['args'] as $k => &$arg) {
+        $key = $paramNames[$k];
         echo "&wilonlt;span style='color:red'&wilongt;$key&wilonlt;/span&wilongt;", ' => ' ,var_dump($arg);
     }
     echo '<pre style="white-space:pre-wrap;word-wrap:break-word;">' .
@@ -18,7 +36,7 @@ function simple_dump(&$arg0 = null, &$arg1 = null, &$arg2 = null, &$arg3 = null,
             array('] => ','&lt;','&gt;', '<', '>'),
             ob_get_clean()
         ) .
-        '</pre>';
+        '</pre><br>';
 }
 
 function simple_log($file, &$arg0 = null, &$arg1 = null, &$arg2 = null, &$arg3 = null, &$arg4 = null, &$arg5 = null, &$arg6 = null, &$arg7 = null, &$arg8 = null, &$arg9 = null, &$arg10 = null, &$arg11 = null, &$arg12 = null, &$arg13 = null, &$arg14 = null, &$arg15 = null, &$arg16 = null, &$arg17 = null, &$arg18 = null, &$arg19 = null, &$arg20 = null)
@@ -39,7 +57,7 @@ function simple_log($file, &$arg0 = null, &$arg1 = null, &$arg2 = null, &$arg3 =
     @file_put_contents($file, json_encode($result) . "\n", FILE_APPEND);
 }
 
-function get_variable_name(&$var, $scope = NULL)
+function get_var_name(&$var, $scope = NULL)
 {
     $scope = $scope ?: $GLOBALS;
     $tmp = $var;
@@ -68,26 +86,6 @@ function get_variable_name(&$var, $scope = NULL)
     return $name ? '$' . $name : false;
 }
 
-function simpledebug_array_keys_vals($array, $key = '', $splice = '|=|')
-{
-    $res = array();
-    foreach ($array as $k => $v) {
-        if ($k === 'GLOBALS') {
-            continue;
-        }
-        $resKey = $key ? "$key$splice$k" : $k;
-        $res[$resKey] = $v;
-        if (is_array($v)) {
-            $res = array_merge($res, simpledebug_array_keys_vals($v, $resKey, $splice));
-        }
-    }
-    foreach ($res as $k => $v) {
-        if (is_array($v)) {
-            unset($res[$k]);
-        }
-    }
-    return $res;
-}
 
 function simpledebug_mkdirs($dir)
 {
