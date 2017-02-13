@@ -1,34 +1,84 @@
 <?php
 
+/**
+ * better var_dump
+ * @return
+ */
 function simple_dump() {
-    // debug_print_backtrace();
+    if (func_num_args() < 1) {
+        throw new Exception('need args');
+    }
+
+    global $SimpleDebug;
+
+    // get code file
     $bt = debug_backtrace();
     $btUse = $bt[0];
+    !isset($SimpleDebug[$btUse['line']]) && $SimpleDebug[$btUse['line']] = 0;
     $file = new \SPLFileObject($btUse['file']);
-    $lineEnd = $btUse['line'];
     $codeStr = '';
+    $codeArr = array();
     foreach ($file as $lineNum => $line) {
-        if ($lineNum == $lineEnd) {
-            break;
-        }
-        if (strpos($line, $btUse['function']) !== false) {
-            $codeStr .= $line;
+        $codeStr .= $line;
+        $codeArr[$lineNum] = trim($line);
+    }
+
+    $tokensAll = token_get_all($codeStr);
+    foreach ($tokensAll as $k => $token) {
+        if ($token[0] == T_COMMENT) {
             continue;
         }
-        if ($codeStr !== '') {
-            $codeStr .= $line;
+        if (isset($token[1]) && trim($token[1]) == '') {
+            continue;
+        }
+        $tokensUse[] = $token;
+    }
+    $funcArr = $funcTmp = array();
+    foreach ($tokensUse as $k => $token) {
+        if (isset($token[1]) && $token[1] == $btUse['function']) {
+            $funcTmp = array();
+            $funcTmp['count'] = 0;
+            $funcTmp['args'] = array();
+            $funcTmp['line'] = $token[2];
+            $argsKey = 0;
+        } else if (isset($argsKey) && isset($funcTmp['args'])) {
+            !isset($funcTmp['args'][$argsKey]) && $funcTmp['args'][$argsKey] = '';
+            $funcTmp['args'][$argsKey] .= is_string($token) ? $token : ($token[1]);
+        }
+        if ($token == ',' && isset($funcTmp['count'])) {
+            $funcTmp['count']++;
+            isset($argsKey) && $argsKey++;
+        }
+        if ($token == ')' && $tokensUse[$k+1] == ';' && !empty($funcTmp)) {
+            $funcArr[] = $funcTmp;
+            unset($funcTmp);
         }
     }
-    $matchs = null;
-    $argsCommaNum = count($btUse['args']) - 1;
-    $preg = "/{$btUse['function']}\(((.*?,){{$argsCommaNum}}.*?)\)/is";
-    preg_match($preg, $codeStr, $matchs);
-    ob_start();$s=array($codeStr, $matchs);foreach($s as $v){var_dump($v);}die('<pre style="white-space:pre-wrap;word-wrap:break-word;">'.preg_replace(array('/\]\=\>\n(\s+)/m','/</m','/>/m'),array('] => ','&lt;','&gt;'),ob_get_clean()).'');
-    $paramNames = array_map('trim', explode(',', $matchs[1]));
+
+    var_dump($SimpleDebug);
+    // foreach ($SimpleDebug as $line => $num) {
+    //     if
+    // }
+
+    $argsNames = $funcArr[$SimpleDebug]['args'];
+    $argsNum = count($btUse['args']);
+    foreach ($argsNames as $k => $args) {
+        if ($k == 0) {
+            $argsNames[$k] = ltrim(rtrim(trim($args), ','), '(');
+        } else if ($k == $argsNum - 1) {
+            $argsNames[$k] = rtrim(trim($args), ')');
+        } else {
+            $argsNames[$k] = rtrim(trim($args), ',');
+        }
+    }
+
+    // dump
     ob_start();
     foreach ($btUse['args'] as $k => &$arg) {
-        $key = $paramNames[$k];
-        echo "&wilonlt;span style='color:red'&wilongt;$key&wilonlt;/span&wilongt;", ' => ' ,var_dump($arg);
+        $key = isset($argsNames[$k]) ? $argsNames[$k] : 'null';
+        echo "&wilonlt;span style='color:red'&wilongt;$key&wilonlt;/span&wilongt;",
+            ' => ',
+            var_dump($arg);
     }
     echo '<pre style="white-space:pre-wrap;word-wrap:break-word;">' .
         preg_replace(
@@ -37,6 +87,8 @@ function simple_dump() {
             ob_get_clean()
         ) .
         '</pre><br>';
+
+    $SimpleDebug[$btUse['line']]++;
 }
 
 function simple_log($file, &$arg0 = null, &$arg1 = null, &$arg2 = null, &$arg3 = null, &$arg4 = null, &$arg5 = null, &$arg6 = null, &$arg7 = null, &$arg8 = null, &$arg9 = null, &$arg10 = null, &$arg11 = null, &$arg12 = null, &$arg13 = null, &$arg14 = null, &$arg15 = null, &$arg16 = null, &$arg17 = null, &$arg18 = null, &$arg19 = null, &$arg20 = null)
@@ -91,3 +143,84 @@ function simpledebug_mkdirs($dir)
 {
     return is_dir($dir) ?: mkdirs(dirname($dir)) && mkdir($dir);
 }
+
+
+/*
+    $funcLineArr = array();
+    $startMark = $endMark = 0;
+    $funcCodeArr = array();
+    foreach ($tokensAll as $k => $token) {
+        if ($token[0] == T_COMMENT) {
+            continue;
+            // if ($key = array_search(trim($token[1]), $codeArr)) {
+                // unset($codeArr[$key]);
+            // }
+        }
+        !isset($funcCodeArr[$startMark]) && $funcCodeArr[$startMark] = '';
+        if (isset($token[1]) && $token[1] == $btUse['function']) {
+            $startMark++;
+            // $funcLineArr[] = $token[2];
+        }
+        if ($token == ';' && $tokensAll[$k-1] == ')') {
+            $endMark++;
+            continue;
+        }
+        if ($endMark !== $startMark) {
+            $funcCodeArr[$startMark] .= is_string($token) ? $token : ($token[1]);
+        }
+    }
+    unset($funcCodeArr[0]);
+    get use function str
+    $funcCodeArr = array();
+    $lineEnd = $btUse['line'];
+    $lineStart = $funcLineArr[$SimpleDebug] - 1;
+    for ($i = $lineEnd; $i >= $lineStart; $i--) {
+        if (!array_key_exists($i, $codeArr)) {
+            continue;
+        }
+        $funcCodeArr[] = $codeArr[$i];
+    }
+    $funcCodeStr = implode('', array_reverse($funcCodeArr));
+
+    parse function str, line has one more this function
+    substr($funcCodeStr, -1) == ')' && $funcCodeStr .= ';';
+    $funcTokens = token_get_all('<?php ' . $funcCodeStr);
+    foreach ($funcTokens as $k => $token) {
+        if (isset($token[1]) && trim($token[1]) == '') {
+            continue;
+        }
+        $tokensUse[] = $token;
+    }
+    $funcArr = $funcTmp = array();
+    foreach ($tokensUse as $k => $token) {
+        if (isset($token[1]) && $token[1] == $btUse['function']) {
+            $funcTmp = array();
+            $funcTmp['count'] = 0;
+            $funcTmp['args'] = array();
+            $argsKey = 0;
+            $funcTmp['str'] = '';
+        } else if (isset($argsKey)) {
+            !isset($funcTmp['args'][$argsKey]) && $funcTmp['args'][$argsKey] = '';
+            $funcTmp['args'][$argsKey] .= is_string($token) ? $token : ($token[1]);
+        }
+        if ($token == ',') {
+            $funcTmp['count']++;
+            isset($argsKey) && $argsKey++;
+        }
+        if ($token == ')' && $tokensUse[$k+1] == ';') {
+            $funcArr[] = $funcTmp;
+        }
+    }
+
+    get args names
+    $argsNum = count($btUse['args']);
+    $argsNames = array();
+    foreach ($funcArr as $func) {
+        !isset($func['count']) && $func['count'] = 0;
+        if ($argsNum == $func['count'] + 1) {
+            $argsNames = $func['args'];
+            break;
+        }
+    }
+
+    */
