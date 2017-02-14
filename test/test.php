@@ -1,8 +1,6 @@
 <?php
 
-error_reporting(0);
-
-require dirname(__FILE__) . '/SimpleDebug.php';
+require dirname(__FILE__) . '/../SimpleDebug.php';
 
 define('MY_CONSTANT', 1);
 
@@ -14,7 +12,7 @@ $ccc = array();
 
 $aa->test();
 
-simple_dump($aa, $ccc); simple_dump($b, $aa);
+simple_dump($aa, $ccc ); simple_dump($b, $aa ); simple_dump($ccc, $aa );
 
 class AA
 {
@@ -24,7 +22,10 @@ class AA
         $bb = new BB();
         $aa = 23333;
         $b = 'xxxx';
-        $ccc = 'xhoif"';
+        $ccc = function ()
+        {
+            return;
+        };
         simple_dump (
 
             $a,
@@ -33,18 +34,19 @@ class AA
 
             $bb,
             "        zafai ofoioi we simple_dump () s",
-            '
-
-            simple_dump
-
-            () '
+            function ()
+            {
+                return;
+            }
             )
 
         ;
 
         simple_dump($aa,
             $b
-            );simple_dump($aa, $ccc); simple_dump($b, $aa); simple_dump($a, $bb, MY_CONSTANT,
+            );
+        simple_dump($aa, $ccc); simple_dump($b, $aa);
+        simple_dump($a, $bb, MY_CONSTANT,
          $bb, MY_CONSTANT,
             // $bb);simple_dump($aa, $b);
             $_GET,
@@ -54,10 +56,10 @@ class AA
              .', ' '
 
 
-            ) ;simple_dump($aa, $b);
+            ) ;
+            simple_dump($aa, $b);
 
 
-            func($aa, $b);
     }
 
     public function FunctionName()
