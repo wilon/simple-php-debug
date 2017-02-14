@@ -15,6 +15,16 @@ function simple_dump()
     $bt = debug_backtrace();
     $args = simpledebug_get_args_info($bt[0]);
 
+    if (PHP_SAPI == 'cli') {
+        foreach ($args as $argName => $arg) {
+            $argName = isset($argName) ? $argName : 'null';
+            echo "\033[1;31m$argName\033[0m",
+                ' => ',
+                var_dump($arg);
+        }
+        return;
+    }
+
     // better dump
     ob_start();
     foreach ($args as $argName => $arg) {
@@ -30,6 +40,7 @@ function simple_dump()
             ob_get_clean()
         ) .
         '</pre><br>';
+    return;
 }
 
 /**
@@ -131,15 +142,12 @@ function simpledebug_get_args_info($btUse)
 
     // handle args name
     $argsNames = $funcArr[$funcMark]['args'];
-    $argsNum = count($btUse['args']);
+    $argsCount = count($btUse['args']);
     foreach ($argsNames as $k => $argName) {
-        if ($k == 0) {
-            $argName = ltrim(rtrim(trim($argName), ','), '(');
-        } else if ($k == $argsNum - 1) {
-            $argName = rtrim(trim($argName), ')');
-        } else {
-            $argName = rtrim(trim($argName), ',');
-        }
+        $argName = trim($argName);
+        $argName = ltrim($argName, '(');
+        $argName = rtrim($argName, ',');
+        $argName = rtrim($argName, ')');
         if (!empty($argName)) {
             $result[$argName] = $btUse['args'][$k];
         } else {

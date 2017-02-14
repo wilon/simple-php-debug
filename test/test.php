@@ -6,13 +6,13 @@ define('MY_CONSTANT', 1);
 
 $aa = new AA();
 
-
 $b = 'outfunc';
+(((((((((simple_dump($b  ,(((((((((   $c))))))))), $a))))))))));
 $ccc = array();
 
 $aa->test();
 
-simple_dump($aa, $ccc ); simple_dump($b, $aa ); simple_dump($ccc, $aa );
+simple_dump($aa, $ccc ); die(simple_dump($b, $aa)); simple_dump($ccc, $aa );
 
 class AA
 {
