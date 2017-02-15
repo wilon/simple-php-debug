@@ -1,6 +1,6 @@
 <?php
 
-require dirname(__FILE__) . '/../SimpleDebug.php';
+require dirname(__FILE__) . '/../src/SimpleDebug.php';
 
 define('MY_CONSTANT', 1);
 

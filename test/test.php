@@ -1,14 +1,14 @@
 <?php
 
-require dirname(__FILE__) . '/../SimpleDebug.php';
+require dirname(__FILE__) . '/../src/SimpleDebug.php';
 
 define('MY_CONSTANT', 1);
 
 $aa = new AA();
 
 $b = 'outfunc';
-(((((((((simple_dump($b  ,(((((((((   $c))))))))), $a))))))))));
 $ccc = array();
+(((((((((simple_dump($b  ,(((((((((   $ccc))))))))), $aa))))))))));
 
 $aa->test();
 

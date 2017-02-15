@@ -6,13 +6,13 @@ Simple PHP Debug, better output and write log.
 Just add this line to your `composer.json` file:
 
 ```json
-"wilon/simple-debug": "^0.1.3"
+"wilon/simple-php-debug": "^0.1.4"
 ```
 
 or
 
 ```sh
-composer require wilon/simple-debug
+composer require wilon/simple-php-debug
 ```
 
 ## A Simple Example

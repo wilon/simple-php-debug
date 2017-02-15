@@ -1,11 +1,11 @@
 {
-    "name": "wilon/simple-debug",
+    "name": "wilon/simple-php-debug",
     "description": "Simple PHP Debug, better output and write log.",
     "license": "MIT",
     "homepage": "https://wilon.github.io",
     "support": {
-        "issues": "https://github.com/wilon/simple-debug/issues",
-        "source": "https://github.com/wilon/simple-debug"
+        "issues": "https://github.com/wilon/simple-php-debug/issues",
+        "source": "https://github.com/wilon/simple-php-debug"
     },
     "keywords": ["php", "debug", "dump"],
     "authors": [
@@ -18,7 +18,7 @@
         "php": ">=5.3"
     },
     "autoload": {
-        "files": ["SimpleDebug.php"]
+        "files": ["src/SimpleDebug.php"]
     },
     "config": {
         "sort-packages": true
