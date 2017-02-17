@@ -1,5 +1,7 @@
 <?php
 
+// error_reporting(0);
+
 require dirname(__FILE__) . '/../src/SimpleDebug.php';
 
 define('MY_CONSTANT', 1);
@@ -9,6 +11,11 @@ $aa = new AA();
 $b = 'outfunc';
 $ccc = array();
 (((((((((simple_dump($b  ,(((((((((   $ccc))))))))), $aa))))))))));
+
+func($aa, $b);
+func($aa, $b);
+func($aa, $b);
+func($aa, $b);
 
 $aa->test();
 
@@ -42,22 +49,6 @@ class AA
 
         ;
 
-        simple_dump($aa,
-            $b
-            );
-        simple_dump($aa, $ccc); simple_dump($b, $aa);
-        simple_dump($a, $bb, MY_CONSTANT,
-         $bb, MY_CONSTANT,
-            // $bb);simple_dump($aa, $b);
-            $_GET,
-            $_SERVER['REMOTE_ADDR']
-            ,
-            '~!@#$%^&*(),
-             .', ' '
-
-
-            ) ;
-            simple_dump($aa, $b);
 
 
     }
@@ -73,5 +64,14 @@ class BB
 
 function func()
 {
-    echo 'composer.json';
+    $a = '2333';
+        $bb = new BB();
+        $aa = 23333;
+        $b = 'xxxx';
+        $ccc = function ()
+        {
+            return;
+        };
+        simple_dump ($a, "xxs", $bb); simple_dump ($a);
+
 }

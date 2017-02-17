@@ -14,7 +14,6 @@ function simple_dump()
     // get args name
     $bt = debug_backtrace();
     $args = simpledebug_get_args_info($bt[0]);
-
     if (PHP_SAPI == 'cli') {
         foreach ($args as $argName => $arg) {
             $argName = isset($argName) ? $argName : 'null';
@@ -64,7 +63,8 @@ function simple_log()
     @simpledebug_mkdirs(dirname($file));
     $result['time'] = date('Y-m-d H:i:s');
     $result['data'] = $args;
-    @file_put_contents($file, json_encode($result) . "\n", FILE_APPEND);
+    $logStr = json_encode($result, JSON_UNESCAPED_UNICODE) . "\n";
+    @file_put_contents($file, $logStr, FILE_APPEND);
     return;
 }
 
@@ -138,7 +138,7 @@ function simpledebug_get_args_info($btUse)
     }
     !isset($SimpleDebug[$funcLine]) && $SimpleDebug[$funcLine] = 0;
     $funcMark = $markArr[$SimpleDebug[$funcLine]];
-    $SimpleDebug[$funcLine]++;
+    $SimpleDebug[$funcLine] = ($SimpleDebug[$funcLine] + 1) % count($markArr);
 
     // handle args name
     $argsNames = $funcArr[$funcMark]['args'];
