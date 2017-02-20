@@ -7,7 +7,7 @@ Simple PHP Debug, better output on browser and write log.
 Just add this line to your `composer.json` file:
 
 ```json
-"wilon/simple-php-debug": "^0.1.4"
+"wilon/simple-php-debug": "^0.1.5"
 ```
 
 or
