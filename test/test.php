@@ -9,10 +9,12 @@ define('MY_CONSTANT', 1);
 $aa = new AA();
 
 $b = 'outfunc';
-$ccc = array();
-(((((((((simple_dump($b  ,(((((((((   $ccc))))))))), $aa))))))))));
+$ccc = array(1,2,3);
 
-func($aa, $b);
+(simple_dump(implode(',', ((($ccc)))), 'xxxx', $b, explode('u', $b)));
+
+(((((((((simple_dump((((((trim((implode(',', $ccc) . 'xx()(())()(((((())(x')))))))))))))))));
+
 func($aa, $b);
 func($aa, $b);
 func($aa, $b);
@@ -40,7 +42,7 @@ class AA
             '($a, $b', MY_CONSTANT,
 
             $bb,
-            "        zafai ofoioi we simple_dump () s",
+            "((()))        zafai ofoioi we simple_dump () s)))))))))))",
             function ()
             {
                 return;
@@ -72,6 +74,6 @@ function func()
         {
             return;
         };
-        simple_dump ($a, "xxs", $bb); simple_dump ($a);
+        simple_dump ($a, "xxs", $bb); simple_dump ($b);
 
 }

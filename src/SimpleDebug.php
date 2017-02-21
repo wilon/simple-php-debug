@@ -104,16 +104,16 @@ function simpledebug_get_args_info($btUse)
     foreach ($tokensUse as $k => $token) {
         if (isset($token[1]) && $token[1] == $btUse['function']) {
             $funcTmp = array();
-            $funcTmp['count'] = 0;
-            $funcTmp['args'] = array();
+            // $funcTmp['args'] = array();
+            $funcTmp['code'] = array();
             $funcTmp['line'] = $token[2];
             $argsKey = 0;
-        } else if (isset($argsKey) && isset($funcTmp['args'])) {
-            !isset($funcTmp['args'][$argsKey]) && $funcTmp['args'][$argsKey] = '';
-            $funcTmp['args'][$argsKey] .= is_string($token) ? $token : ($token[1]);
+            continue;
         }
-        if ($token == ',' && isset($funcTmp['count'])) {
-            $funcTmp['count']++;
+        if (isset($funcTmp['code'])) {
+            $funcTmp['code'][] = $token;
+        }
+        if ($token == ',') {
             isset($argsKey) && $argsKey++;
         }
         if ($token == ')' && $tokensUse[$k+1] == ';' && !empty($funcTmp)) {
@@ -121,7 +121,9 @@ function simpledebug_get_args_info($btUse)
             unset($funcTmp);
         }
     }
-
+    foreach ($funcArr as $k => $func) {
+        $funcArr[$k]['args'] = simpledebug_parse_code_token($func['code']);
+    }
     // get the function use line
     $funcMark = $funcLine = 0;
     $markArr = array();
@@ -136,6 +138,7 @@ function simpledebug_get_args_info($btUse)
             $markArr[] = $k;
         }
     }
+
     !isset($SimpleDebug[$funcLine]) && $SimpleDebug[$funcLine] = 0;
     $funcMark = $markArr[$SimpleDebug[$funcLine]];
     $SimpleDebug[$funcLine] = ($SimpleDebug[$funcLine] + 1) % count($markArr);
@@ -145,9 +148,18 @@ function simpledebug_get_args_info($btUse)
     $argsCount = count($btUse['args']);
     foreach ($argsNames as $k => $argName) {
         $argName = trim($argName);
-        $argName = ltrim($argName, '(');
         $argName = rtrim($argName, ',');
+        $argName = ltrim($argName, '(');
         $argName = rtrim($argName, ')');
+        $argTokenArr = token_get_all('<?php ' . $argName);
+        $ln = $rn = 0;
+        foreach ($argTokenArr as $argToken) {
+            if ($argToken == '(') $ln++;
+            if ($argToken == ')') $rn++;
+        }
+        if (($n = $ln - $rn) > 0) {
+            $argName .= str_repeat(')', $n);
+        }
         if (!empty($argName)) {
             $result[$argName] = $btUse['args'][$k];
         } else {
@@ -156,6 +168,53 @@ function simpledebug_get_args_info($btUse)
     }
 
     return $result;
+}
+
+function simpledebug_parse_code_token($tokenArr)
+{
+    if ($tokenArr[0] == '(') {
+        unset($tokenArr[0]);
+    }
+    $bracketArr2 = array();
+    foreach ($tokenArr as $k => $token) {
+        if (is_string($token) && in_array($token, array('(', ')'))) {
+            $bracketArr2[$k] = $token;
+        }
+    }$bracketArr = array();
+    foreach ($tokenArr as $k => $token) {
+        $c = count($bracketArr);
+        if (is_string($token) && $token == '(') {
+            $bracketArr[] = array('start' => $k);
+            continue;
+        }
+        if (is_string($token) && $token == ')') {
+            for ($i = $c-1; $i >= 0; $i--) {
+                if (!array_key_exists('end', $bracketArr[$i])) {
+                    $bracketArr[$i]['end'] = $k;
+                    break;
+                }
+            }
+            continue;
+        }
+    }
+    $argsKey = 0;
+    $argsArr = array();
+    foreach ($tokenArr as $k => $token) {
+        $inArgs = false;
+        foreach ($bracketArr as $bracket) {
+            if ($k >= $bracket['start'] && $k <= $bracket['end']) {
+                $inArgs = true;
+                break;
+            }
+        }
+        if ($inArgs !== true && $token == ',') {
+            isset($argsKey) && $argsKey++;
+            continue;
+        }
+        !isset($argsArr[$argsKey]) && $argsArr[$argsKey] = '';
+        $argsArr[$argsKey] .= is_string($token) ? $token : ($token[1]);
+    }
+    return $argsArr;
 }
 
 function simpledebug_mkdirs($dir)
