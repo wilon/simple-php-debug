@@ -10,7 +10,11 @@ $aa = new AA();
 
 $b = 'outfunc';
 $ccc = array(1,2,3);
+$d = 0;
 
+simple_dump($aa, $b, $ccc, $d, '');
+simple_log('./test/some.log', $aa, $b, $ccc, $d, '');
+die;
 (simple_dump(implode(',', ((($ccc)))), 'xxxx', $b, explode('u', $b)));
 
 (((((((((simple_dump((((((trim((implode(',', $ccc) . 'xx()(())()(((((())(x')))))))))))))))));

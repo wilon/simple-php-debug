@@ -56,7 +56,7 @@ function simple_log()
     $args = simpledebug_get_args_info($bt[0]);
     $file = $bt[0]['args'][0];
     foreach ($args as $argName => $arg) {
-        if ($arg == $file) {
+        if ($arg === $file) {
             unset($args[$argName]);
         }
     }
