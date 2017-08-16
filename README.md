@@ -1,5 +1,14 @@
 # SimplePHPDebug
 
+[![Packagist][badge_package]][link-packagist]
+[![Packagist Release][badge_release]][link-packagist]
+[![Packagist Downloads][badge_downloads]][link-packagist]
+
+[badge_package]:      https://img.shields.io/badge/package-wilon/simple--php--debug-blue.svg?style=flat-square
+[badge_release]:      https://img.shields.io/packagist/v/wilon/simple-php-debug.svg?style=flat-square
+[badge_downloads]:    https://img.shields.io/packagist/dt/wilon/simple-php-debug.svg?style=flat-square
+[link-packagist]:     https://packagist.org/packages/wilon/simple-php-debug
+
 Simple PHP Debug, better output on browser and write log.
 
 ## Installation & loading
